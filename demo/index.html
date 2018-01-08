@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Test</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+    </style>
+    <script src="../umd/round-slider.js"></script>
+    <style>
+        .RoundSlider {
+            display: inline-block;
+        }
+
+        svg circle {
+            transition: stroke-dashoffset 1s linear;
+        }
+    </style>
+    <script>
+        function loadSlider() {
+            // var neki = new RoundSlider('#round-slider', {
+            //     color: 'yellow'
+            // });
+            var $txt1 = document.querySelector("#txt1")
+            var $txt2 = document.querySelector("#txt2")
+            new RoundSlider('#round-slider', {
+                color: 'purple',
+                radius: 50,
+                max: 1000,
+                min: 500,
+                onChange: function (val) {
+                    document.querySelector("#txt1").innerHTML = val + " $"
+                }
+            });
+            new RoundSlider('#round-slider2', {
+                color: 'red',
+                radius: 100,
+                max: 200,
+                min: 0,
+                step: 25,
+                value: 50,
+                strokeWidth: 30,
+                onChange: function (val) {
+                    $txt2.innerHTML = val + " kg"
+                }
+            });
+            $txt1.innerHTML = "500 $"
+            $txt2.innerHTML = "50 kg"
+        }
+    </script>
+</head>
+
+<body onload="loadSlider()">
+    <div class='item'>
+
+        <div id="round-slider"></div>
+        <div id="txt1"></div>
+    </div>
+    <div class='item'>
+        <div id="round-slider2"></div>
+
+        <div id="txt2"></div>
+    </div>
+</body>
+
+</html>
