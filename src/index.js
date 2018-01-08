@@ -231,5 +231,5 @@ class RoundSlider {
 
 
 // ## Just for testing
-new RoundSlider('#app', { color: 'red'})
+// new RoundSlider('#app', { color: 'red'})
 export default RoundSlider
