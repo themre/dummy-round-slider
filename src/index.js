@@ -13,6 +13,7 @@ const defaults = {
 
 const classNamePrefix = 'RoundSlider'
 const DEGREE_IN_RADIANS = Math.PI / 180
+let touches = []
 
 class RoundSlider {
   constructor(selector, options) {
@@ -23,50 +24,80 @@ class RoundSlider {
       return
     }
     this.uniqueId = Math.floor(Math.random() * 100) + Date.now() // uniqueId
-
+    this.element.append
     this.options = { ...defaults, ...options }
     this.value = this.options.value
     this.element.className = classNamePrefix
-    this.svgEl = null
-    this.element.addEventListener('click', e => this.setValue(e, true), false)
+    this.svgWrap = document.createElement('div')
+    this.handle = document.createElement('div')
+    this.handle.className = 'sliderHandle'
+    this.element.append(this.svgWrap)
+    this.element.append(this.handle)
+
+    this.element.addEventListener(
+      'click',
+      e => this.allowChange && this.setValue(e, true),
+      false
+    )
+    this.handle.addEventListener('mouseup', this.up, false)
     this.element.addEventListener('mouseup', this.up, false)
-    // TODO touch sliding
-    // this.element.addEventListener('touchstart', e => this.setValue(e, true), false)
-    this.element.addEventListener('touchmove', e => e.preventDefault(), false)
+    this.handle.addEventListener('touchstart', this.down, false)
     this.element.addEventListener('touchend', this.up, false)
-    this.element.addEventListener('mousedown', this.down, false)
+    this.element.addEventListener('touchcancel', this.up, false)
+    this.handle.addEventListener('mousedown', this.down, false)
     this.updateView()
   }
-
-  up = () => {
+  
+  getTouchMove = e => {
+    if (this.allowChange || this.isDrag) {
+      let idx = 0
+      for (let index = 0; index < e.changedTouches.length; index++) {
+        const t = e.changedTouches[index]
+        if (t.identifier >= 0 ) {
+          touches = [t]
+          this.setValue(touches[idx]) 
+        }
+        
+      }
+    }
+  }
+  
+  up = e => {
+    this.allowChange = false
+    this.isDrag = false
     this.element.removeEventListener('mousemove', this.setValue, true)
     this.element.removeEventListener('touchmove', this.setValue, true)
-    this.element.removeEventListener('touchend', this.up, true)
-    this.isDrag = false
-    console.log('up')
+    touches = [] // clear touches
     this.options.onAfterChange && this.options.onAfterChange(this.value)
   }
-
-  down = () => {
+  
+  down = e => {
+    e.preventDefault
     this.isDrag = true
-    this.element.addEventListener('mousemove', this.setValue, true)
+    this.allowChange = true
+    if (e.changedTouches) {
+      touches.push(...e.changedTouches)
+      this.element.addEventListener('touchmove', this.getTouchMove, false)
+    } else {
+      this.element.addEventListener('mousemove', this.setValue, true)
+    }
   }
-
+  
   setValue = (event, forceSet) => {
-    console.log('setValue')
     if (!this.isDrag && !forceSet) return
-    let eX, eY = 0
-    if (event.touches) {
-      const {clientX, clientY } = event.touches[0]
-      eX = clientX
-      eY = clientY
+    let eX,
+      eY = 0
+    if (event.force) {
+      const { pageX, pageY } = event
+      eX = pageX
+      eY = pageY
     } else {
       eX = event.x
       eY = event.y
     }
     const { left, top } = this.getCenter()
     const x = eX - left,
-      y = eY - top
+    y = eY - top
     const { value, angle } = this.stepRounding(this.angle(y, x))
     this.value = value
     this.updateView()
@@ -109,8 +140,8 @@ class RoundSlider {
     if (value >= currVal)
       val = value - currVal < nextVal - value ? currVal : nextVal
     else val = currVal - value > value - preVal ? currVal : preVal
-
-    ;(val = Math.round(val)), (ang = this.valueToAngle(val))
+    val = Math.round(val)
+    ang = this.valueToAngle(val)
     return { value: val, angle: ang }
   }
 
@@ -131,15 +162,11 @@ class RoundSlider {
     return angle + 90
   }
 
-  setValue(value) {
-    this.value = value
-  }
-
   updateView() {
     const { step, radius, min, max, strokeWidth, color, bgColor } = this.options
     const segments = (max - min) / step
     const maskName = `${classNamePrefix}_${this.uniqueId}`
-    this.svgEl = `<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width='${radius *
+    const svgEl = `<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width='${radius *
       2}' height='${radius * 2}'>
           <defs>
             <mask id="${maskName}">
@@ -179,7 +206,9 @@ class RoundSlider {
             })}"
           />
         </svg>`
-    this.element.innerHTML = this.svgEl
+    this.svgWrap.innerHTML = svgEl
+    this.handle.style.transform = `rotate(${this.valueToAngle(this.value) -
+      90}deg)`
   }
 
   createView(element) {
@@ -229,7 +258,6 @@ class RoundSlider {
   }
 }
 
-
 // ## Just for testing
-// new RoundSlider('#app', { color: 'red'})
+// new RoundSlider('#app', { color: 'red' })
 export default RoundSlider
