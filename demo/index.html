@@ -10,6 +10,26 @@
     </style>
     <script src="../umd/round-slider.min.js"></script>
     <link href='../style.css' rel="stylesheet" />
+    <style>
+        .texts {
+            width: 100px;
+        }
+        .sliders,
+        .texts {
+            display: inline-block;
+            vertical-align: top;
+            margin-right: 15px;
+        }
+        .sliders > * {
+            position: absolute;
+        }
+        #round-slider {
+            margin: 50px;
+        }
+        #round-slider3 {
+            margin: 25px;
+        }
+    </style>
     <script>
         function loadSlider() {
             // var neki = new RoundSlider('#round-slider', {
@@ -17,6 +37,7 @@
             // });
             var $txt1 = document.querySelector("#txt1")
             var $txt2 = document.querySelector("#txt2")
+            var $txt3 = document.querySelector("#txt3")
             new RoundSlider('#round-slider', {
                 color: 'purple',
                 radius: 50,
@@ -33,27 +54,40 @@
                 min: 0,
                 step: 25,
                 value: 50,
-                strokeWidth: 30,
+                strokeWidth: 20,
                 onChange: function (val) {
                     $txt2.innerHTML = val + " kg"
                 }
             });
+            new RoundSlider('#round-slider3', {
+                color: '#0c0',
+                radius: 75,
+                max: 1200,
+                min: 200,
+                step: 25,
+                value: 700,
+                strokeWidth: 20,
+                onChange: function (val) {
+                    $txt3.innerHTML = val + " €"
+                }
+            });
             $txt1.innerHTML = "500 $"
             $txt2.innerHTML = "50 kg"
+            $txt3.innerHTML = "700 €"
         }
     </script>
 </head>
 
 <body onload="loadSlider()">
-    <div class='item'>
-
-        <div id="round-slider"></div>
+    <div class="texts">
         <div id="txt1"></div>
-    </div>
-    <div class='item'>
-        <div id="round-slider2"></div>
-
         <div id="txt2"></div>
+        <div id="txt3"></div>
+    </div>
+    <div class='sliders'>
+        <div id="round-slider3"></div>
+        <div id="round-slider2"></div>
+        <div id="round-slider"></div>
     </div>
 </body>
 

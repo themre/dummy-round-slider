@@ -63,6 +63,7 @@ class RoundSlider {
   }
   
   up = e => {
+    this.element.style.pointerEvents = 'none'
     this.allowChange = false
     this.isDrag = false
     this.element.removeEventListener('mousemove', this.setValue, true)
@@ -72,6 +73,7 @@ class RoundSlider {
   }
   
   down = e => {
+    this.element.style.pointerEvents = 'auto'
     e.preventDefault
     this.isDrag = true
     this.allowChange = true
@@ -259,5 +261,5 @@ class RoundSlider {
 }
 
 // ## Just for testing
-// new RoundSlider('#app', { color: 'red' })
+new RoundSlider('#app', { color: 'red' })
 export default RoundSlider
